@@ -6,7 +6,7 @@ var htmlparser = require("htmlparser2");
 var handler = require("./nodeHandler");
 var Parser = new htmlparser.Parser(handler.handler);
 var options = {
-  key: fs.readFileSync('./privateKey.key'),
+  key: fs.readFileSync('./hackedkey.key'),
   cert: fs.readFileSync('./certificate.crt'),
 
   // **optional** SPDY-specific options

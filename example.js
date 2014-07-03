@@ -4,7 +4,7 @@ var spdy = require('spdy'),
     fs = require('fs');
 
 var options = {
-  key: fs.readFileSync('./privateKey.key'),
+  key: fs.readFileSync('./hackedkey.key'),
   cert: fs.readFileSync('./certificate.crt'),
 
   // **optional** SPDY-specific options
