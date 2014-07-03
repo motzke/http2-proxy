@@ -1,5 +1,6 @@
 var spdy = require('spdy');
 var http = require('http');
+var https = require('https');
 var fs = require('fs');
 var url = require('url');
 var htmlparser = require("htmlparser2");
@@ -30,16 +31,28 @@ spdy.createServer(options, function(request, response) {
      var proxyUrl = url.parse(queryObject.url)
       proxyUrl.method = request.method;
       proxyUrl.headers = request.headers;
+      proxyUrl.headers["accept-encoding"] = "identity";
+      proxyUrl.headers["referer"] = "";
+      proxyUrl.headers["host"] = url.hostname;
 
-    var proxy_request = http.request(proxyUrl, function(proxy_response){
+    var proxy_request;
+    if(proxyUrl.protocol == "http:"){
+      proxy_request = http.request(proxyUrl);
+    }
+    else{
+      proxy_request = https.request(proxyUrl);
+    } 
+
+    proxy_request.on("response", function(proxy_response){
+      handler.setContext(proxyUrl);
       proxy_response.on('data', function(chunk) {
-        response.write(chunk, 'binary');
         Parser.write(chunk);
       });
       proxy_response.on('end', function() {
-        response.write("pups");
+        response.write(""+handler.getHTML());
         response.end();
         Parser.end()
+        Parser.reset();
       });
       response.writeHead(proxy_response.statusCode, proxy_response.headers);
     });
