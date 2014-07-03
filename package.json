@@ -1,0 +1,24 @@
+{
+  "name": "http2-proxy",
+  "version": "0.0.1",
+  "description": "",
+  "main": "proxy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/motzke/http2-proxy.git"
+  },
+  "author": "Matthias Motzke",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/motzke/http2-proxy/issues"
+  },
+  "homepage": "https://github.com/motzke/http2-proxy",
+  "dependencies": {
+    "http2": "2.5.3",
+    "spdy": "~1.27.0",
+    "htmlparser2": "~3.7.2"
+  }
+}
