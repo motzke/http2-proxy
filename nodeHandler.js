@@ -2,7 +2,7 @@ var html = "";
 var uOb = {};
 var handler = {
     onopentag: function(name, attribs){
-    	//console.log("node");
+    	//console.log("node : "+name);
     	html+="<" + name;
 	    for(key in attribs){
 	    	if(key == "src" || key == "href"){
@@ -11,12 +11,12 @@ var handler = {
 	    		if(attribs[key].indexOf("/") != 0 && attribs[key].indexOf("http") != 0 ){
 	    			attribs[key] = uOb.protocol+"//"+uOb.hostname+attribs[key] + "/";
 	    		}
+                else if(attribs[key].indexOf("//") == 0){
+                    attribs[key] = uOb.protocol+attribs[key];
+                }
 	    		else if(attribs[key].indexOf("/") == 0){
 	    			attribs[key] = uOb.protocol+"//"+uOb.hostname+attribs[key];
 	    		}
-	    		else if(attribs[key].indexOf("//") == 0){
-	    			attribs[key] = uOb.protocol+attribs[key];
-	    		}	    		
 	    		html+=" " +key+"='https://localhost:8080/?url="+encodeURIComponent(attribs[key])+"'";
 	    	}
 	    	else{

@@ -3,9 +3,7 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var url = require('url');
-var htmlparser = require("htmlparser2");
-var handler = require("./nodeHandler");
-var Parser = new htmlparser.Parser(handler.handler);
+
 var options = {
   key: fs.readFileSync('./hackedkey.key'),
   cert: fs.readFileSync('./certificate.crt'),
@@ -17,8 +15,9 @@ var options = {
   autoSpdy31: true
 };
 
-Parser.on("onend", function(){
-  console.log("parsing ended.")
+
+process.on('uncaughtException', function(err) {
+  console.log('Caught exception: ' + err);
 });
 
 spdy.createServer(options, function(request, response) {
@@ -44,17 +43,39 @@ spdy.createServer(options, function(request, response) {
     } 
 
     proxy_request.on("response", function(proxy_response){
-      handler.setContext(proxyUrl);
-      proxy_response.on('data', function(chunk) {
-        Parser.write(chunk);
-      });
-      proxy_response.on('end', function() {
-        response.write(""+handler.getHTML());
-        response.end();
-        Parser.end()
-        Parser.reset();
-      });
-      response.writeHead(proxy_response.statusCode, proxy_response.headers);
+
+      response.writeHead(200, proxy_response.headers);
+  		console.log("content-type " + proxy_response.headers["content-type"]);
+    	if(proxy_response.headers && proxy_response.headers["content-type"] && proxy_response.headers["content-type"].indexOf("text") != -1 && proxy_response.headers["content-type"].indexOf("html") != -1){
+            console.log("Turning on html parser.");
+            var htmlparser = require("htmlparser2");
+            var handler = require("./nodeHandler");
+            var Parser = new htmlparser.Parser(handler.handler);	
+            handler.setContext(proxyUrl);
+            proxy_response.on('data', function(chunk) {
+              Parser.write(chunk);
+            });
+            proxy_response.on('end', function() {
+              response.write(""+handler.getHTML());
+              response.end();
+              Parser.end()
+              Parser.reset();
+            });
+    		
+    		
+    	}
+    	else{
+            console.log("writing binary data");
+            proxy_response.on('data', function(chunk) {
+              response.write(chunk, "binary");
+            });
+            proxy_response.on('end', function() {
+              response.end();
+            });
+  	}
+		
+
+      
     });
 
     
